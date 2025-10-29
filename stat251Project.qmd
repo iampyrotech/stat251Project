@@ -13,11 +13,44 @@ library(tidyverse)
 library(readxl)
 ```
 
-### Data Set
+## Shark Analysis
 
--   General information about our data set
--   Information about the columns
--   Link
+### Proposed Data Set
+
+This data comes form Global Shark Attack File (GSAF). It is a compilation of shark attack information coming from many different sources. Details of the individual columns are contained below:
+link: "https://www.sharkattackfile.net/"
+
+Columns include:
+
+Date – Month and Day of Attack
+
+Year – Year of the Attack
+
+Type – Provoked or Unprovoked Attack
+
+Country – Country where the Attack happened
+
+State – State in the Country
+
+Location – Specific location of the Attack
+
+Activity – What the victim was doing at the time of the attack
+
+Name – Victim's name
+
+Sex – Victim's biological sex
+
+Age – Victim's age
+
+Injury – Description of Injuries
+
+Fatal Y/N -- Binary Y/N of whether the Attack was fatal or not
+
+Time – Time of the Attack
+
+Species – Species of shark involved in the Attack
+
+Source – Who reported the Attack
 
 ### EDA
 
@@ -137,8 +170,14 @@ sharks %>%
 
 Ultimately, our goal is to understand if Gender has an effect on the fatality of shark attacks. This graph allows us to quickly get an idea of what those proportions look like. It appears that of the reported attacks, male victims have a higher mortality rate than female victims. Once we preform our full analysis we will be better able to tell if this is a significant difference, and potentially begin to pontificate on why this is the case.
 
-### Research Question
+### Proposed Research Question
 
--   Your proposed research question
--   why you chose that research question
--   and how the data will permit you to answer it.
+Is there a difference between the fatality rate from shark attacks for men and women?
+
+### Why
+
+Sharks are the best! We chose our research question because we are curious about how the fatalities between men and women compare. We're interested in seeing if there are certain factors (i.e., gender, location, activity, etc.) that impact fatality more than others.
+
+### How the data will permit us to answer our research question:
+
+The data will help us answer our research question because we can compare the fatality rate among genders as well as the fatality rate for activity or location or whether it was a provoked or unprovoked attack.
