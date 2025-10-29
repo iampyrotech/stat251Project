@@ -17,7 +17,7 @@ library(readxl)
 
 ### Proposed Data Set
 
-This data comes form Global Shark Attack File (GSAF). It is a compilation of shark attack information coming from many different sources. Details of the individual columns are contained below:
+This data comes from Global Shark Attack File (GSAF). It is a compilation of shark attack information coming from many different sources. Details of the individual columns are contained below:
 link: "https://www.sharkattackfile.net/"
 
 Columns include:
