@@ -121,6 +121,14 @@ legend("topright", legend = c("Prior", "Posterior"),
 
 ### Discussion
 
+Our posterior results indicate a clear difference in fatality rates between men and women. The posterior distribution of $\theta_{female} - \theta_{male}$ is centered below zero, and the 95 percent credible interval stays entirely negative. This implies that, based on the data, women have a lower probability of dying from a shark attack than men. Despite using weak priors, the data overwhelmingly push the posteriors toward the observed male–female gap.
+
+That said, several limitations temper the strength of this conclusion. The Global Shark Attack File aggregates incidents across many decades and regions, and reporting quality varies. The binomial model also assumes a constant fatality probability within each gender even though factors like shark species, activity, and location clearly affect outcomes. Ignoring these sources of heterogeneity likely understates uncertainty. Finally, the data itself may suffer from reporting and selection biases.
+
+Future work could incorporate additional predictors or use a hierarchical model to better account for variation across attack types and conditions. Examining how fatality rates change over time or differ across regions would also help clarify whether the observed gender gap reflects biological, behavioral, or environmental differences.
+
+Overall, our analysis identifies a modest but credible difference in fatality probabilities, while leaving room for more detailed modeling to explain why that difference exists.
+
 ### Appendix
 
 ```{r, message=FALSE, warning=FALSE}
