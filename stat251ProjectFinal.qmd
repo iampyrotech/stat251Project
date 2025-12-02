@@ -11,33 +11,9 @@ authors: "AJ, Chase, Chloe"
 
 library(tidyverse)
 library(readxl)
-```
 
-## Shark Analysis
+set.seed(2025)
 
-### Introduction
-
-Is there a difference between the fatality rate from shark attacks for men and women?
-
-Sharks are the best! We chose our research question because we are curious about how the fatalities between men and women compare. We're interested in seeing if there are certain factors (i.e., gender, location, activity, etc.) that impact fatality more than others.
-
-The data will help us answer our research question because we can compare the fatality rate among genders as well as the fatality rate for activity or location or whether it was a provoked or unprovoked attack.
-
-### Methods
-
-Our data comes from Global Shark Attack File ("https://www.sharkattackfile.net/"). It is a compilation of shark attack information coming from many different sources.
-
-Each of our observations represent one occurrence of a shark attack. For each observation we have information about the sex of the victim and the fatality of the attack -- whether the victim survived or was killed. Our data lends itself to the binomial setting. We have a fixed number of events where each has a binary outcome, fatal or nonfatal. It is fairly reasonable to assume that our events are independent. It is unlikely that one shark attack has any sort of significant impact on another. The assumption of greatest concern in using a binomial likelihood is the constant fatality probability of each event. It is unlikely that the fatality of each shark attack is exactly the same. Ignoring this violation would normally result in underestimating the variability of our prediction for the probability of a shark attack being fatal. However, using beta-binomial Bayesian inference allows us to accurately convey our levels of uncertainty.
-
-Our parameters of interest are $\theta_{female}$ and $\theta_{male}$. These parameters represent the probability that a shark attack is fatal for each respective sex. With these parameters, we can use Monte Carlo simulation to generate a posterior distribution for $\theta_{female-male}$. With this distribution we can answer our question of whether one sex is more likely to survive a shark attack than another is. Based on the likelihood chosen and our prior beliefs about our shark attacks, we have chosen $\pi_{female} \sim beta(1,19)$ for our prior for females. We chose a similar $\pi_{male} \sim beta(2,18)$ prior for male fatality rates. We chose beta priors because they are conjugate with the binomial setting, and because they make it easy for us to encode our prior beliefs. In our priors we assume that about 1/20 shark attacks will be fatal to women and about 2/20 shark attacks will be fatal for men. Our priors encode a slight survival favoritism towards women because that is what we expect to occur in our data. This favoritism is very weak overall, allowing room for our data to inform our posterior distribution.
-
-### Results
-
-### Discussion
-
-### Appendix
-
-```{r, warning=FALSE, message=FALSE}
 sharks <- read_excel("sharks.xlsx") %>% 
   select(1:14) %>%
   rename(Fatal = 'Fatal Y/N') %>% 
@@ -54,81 +30,21 @@ sharks <- read_excel("sharks.xlsx") %>%
   select(Year, Sex, Fatal)
 ```
 
-Here we read in the shark attack data and clean the variables of greatest interest. We make sure all upper and lower case versions for "Male" and "Female" are counted for "Sex" and all cases of "Yes" and "No" are counted for "Fatal". We also ensure that year is counted numerically and filter for only those shark attacks in the last 100 years because the data before that period is not well kept.
+## Shark Analysis
 
-#### Shark Attacks Each Year
+### Introduction
 
-```{r}
-sharks %>% 
-  filter(!is.na(Sex)) %>% 
-  ggplot(aes(x = Year)) +
-  geom_histogram(fill = "darkblue") +
-  theme_minimal() +
-  labs(title = "Reported Shark Attacks by Year",
-       x = "Year",
-       y = "Number of Shark Attacks")
-```
+Is there a difference between the fatality rate from shark attacks for men and women?
 
-First of all, we want to look at the general distributions of shark attacks over the last 100 years. We can see that the number of reported shark attacks has risen greatly over this period of time. It appears that the growth has accelerated in the last 10-20 years. We wonder if this truly reflects an increase in the number of attacks or if it has more to do with the increase in access to technology for reporting.
+Sharks are the best! We chose our research question because we are curious about how the fatalities between men and women compare. We're interested in seeing if there are certain factors (i.e., gender, location, activity, etc.) that impact fatality more than others.
 
-#### Shark Attacks by Gender
+The data will help us answer our research question because we can compare the fatality rate among genders as well as the fatality rate for activity or location or whether it was a provoked or unprovoked attack.
 
-```{r}
-sharks %>% 
-  filter(!is.na(Sex)) %>% 
-  ggplot(aes(x = Year)) +
-  geom_histogram(fill = "darkblue") +
-  facet_wrap(~Sex) +
-  theme_minimal() +
-  labs(title = "Reported Shark Attacks by Year and Victim Gender",
-       x = "Year",
-       y = "Number of Shark Attacks")
-```
+### Methods
 
-We also wanted to take a look at the general trend for the number of reported shark attacks by year, split up among the genders. Although they follow a somewhat similar trend, the number of male victims is magnitudes larger than the number of female victims each year. Even though the number victims by gender differ greatly, we can still compare the proportions for these groups.
+Our data comes from Global Shark Attack File ("https://www.sharkattackfile.net/"). It is a compilation of shark attack information coming from many different sources. Each of our observations represent one occurrence of a shark attack. For each observation we have information about the sex of the victim and the fatality of the attack -- whether the victim survived or was killed. Below is a graph that displays the differences in mortality rates for male and female victims.
 
-#### Shark Attacks by Country
-
-```{r}
-sharks %>%
-  group_by(Country) %>%
-  count() %>% 
-  arrange(desc(n)) %>% 
-  head(10) %>% 
-  ggplot(aes(x = n, y = reorder(Country, n))) +
-  geom_col(fill = "steelblue") +
-  labs(title = "Top 10 Countries for Reported Shark Attacks",
-       x = "Number of Shark Attacks",
-       y = "Country") +
-  theme_minimal()
-```
-
-We also looked at the number of shark attacks per country. We focused on the nations with the largest number of reported shark attacks, noting that by far, "USA", "Australia" and "South Africa" lead the world. This is good to note as a potential variable of interest. It also gives us some sort of an idea where our observations are coming from.
-
-#### Fatality of Shark Attacks
-
-```{r}
-sharks %>% 
-  filter(!is.na(Fatal)) %>% 
-  count(Fatal) %>% 
-  mutate(prop = n / sum(n)) %>% 
-  ggplot(aes(x = Fatal, y = prop, fill = Fatal)) +
-  geom_col() +
-  scale_x_discrete(labels = c("Yes" = "Fatal", "No" = "Non-Fatal")) +
-  scale_fill_manual(values = c("Yes" = 'firebrick', "No" = "steelblue"),
-                    labels = c("Yes" = "Fatal", "No" = "Non-Fatal")) +
-  labs(title = "Proportion of Fatal vs Non-Fatal Shark Attacks",
-       x = NULL,
-       y = "Proportion",
-       fill = NULL) +
-  theme_minimal()
-```
-
-Now we take a look at our variable of interest, fatality. By summing over all of the reported attacks in the last century we can get a rough estimate of the proportion of shark attacks that result in the death of the victim. A little less than 20% of the shark attacks we have access to have been fatal.
-
-#### Fatality by Gender
-
-```{r}
+```{r, echo=FALSE}
 sharks %>% 
   filter(!is.na(Fatal)) %>% 
   filter(!is.na(Sex)) %>% 
@@ -139,8 +55,8 @@ sharks %>%
   geom_col() +
   facet_wrap(~Sex) +
   scale_fill_manual(values = c("Yes" = 'firebrick', "No" = "steelblue"),
-                    labels = c("Yes" = "Fatal", "No" = "Non-Fatal")) +
-  labs(title = "Proportion of Fatal vs Non-Fatal Shark Attacks by Gender",
+                    labels = c("Yes" = "Fatal", "No" = "Nonfatal")) +
+  labs(title = "Proportion of Fatal vs Non-Fatal Shark Attacks by Sex",
        x = NULL,
        y = "Proportion",
        fill = NULL) +
@@ -149,4 +65,127 @@ sharks %>%
         axis.ticks.x = element_blank())
 ```
 
-Ultimately, our goal is to understand if Gender has an effect on the fatality of shark attacks. This graph allows us to quickly get an idea of what those proportions look like. It appears that of the reported attacks, male victims have a higher mortality rate than female victims. Once we preform our full analysis we will be better able to tell if this is a significant difference, and potentially begin to pontificate on why this is the case.
+Our data lends itself to the binomial setting. We have a fixed number of events where each has a binary outcome, fatal or nonfatal. It is fairly reasonable to assume that our events are independent. It is unlikely that one shark attack has any sort of significant impact on another. The assumption of greatest concern in using a binomial likelihood is the constant fatality probability of each event. It is unlikely that the fatality of each shark attack is exactly the same. Ignoring this violation would normally result in underestimating the variability of our prediction for the probability of a shark attack being fatal. However, using beta-binomial Bayesian inference allows us to accurately convey our levels of uncertainty.
+
+Our parameters of interest are $\theta_{female}$ and $\theta_{male}$. These parameters represent the probability that a shark attack is fatal for each respective sex. With these parameters, we can use Monte Carlo simulation to generate a posterior distribution for $\theta_{female-male}$. With this distribution we can answer our question of whether one sex is more likely to survive a shark attack than another is. Based on the likelihood chosen and our prior beliefs about our shark attacks, we have chosen $\pi_{female} \sim beta(1,9)$ for our prior for females. We chose a similar $\pi_{male} \sim beta(2,8)$ prior for male fatality rates. We chose beta priors because they are conjugate with the binomial setting, and because they make it easy for us to encode our prior beliefs. In our priors we assume that about 1/10 shark attacks will be fatal to women and about 2/10 shark attacks will be fatal for men. Our priors encode a slight survival favoritism towards women because that is what we expect to occur in our data. This favoritism is very weak overall, allowing room for our data to inform our posterior distribution.
+
+### Results
+
+First of all, in order to preform our analysis we obtain the posterior distributions for $\theta_{male}$. The graph below displays the prior and posterior distribution for males.
+
+```{r, echo=FALSE}
+a_male <- 2
+b_male <- 8
+a_star_male <- nrow(sharks %>% filter(Sex == 'Male') %>% filter(Fatal == "Yes")) + a_male
+b_star_male <- nrow(sharks %>% filter(Sex == 'Male') %>% filter(Fatal == "No")) + b_male
+
+theta <- seq(0,.5,by = .0001)
+plot(theta, dbeta(theta, a_star_male, b_star_male), type='l', col="red",
+     xlab=expression(theta), ylab="Density", 
+     main="Fatality of Shark Attacks Among Males")
+lines(theta, dbeta(theta, a_male, b_male), col="blue")
+legend("topright", legend = c("Prior", "Posterior"),
+       col = c("blue", "red"), lty = 1)
+```
+
+We also obtain the posterior distribution for females and graph the prior and posterior for it.
+
+```{r, echo=FALSE}
+a_female <- 1
+b_female <- 9
+a_star_female <- nrow(sharks %>% filter(Sex == 'Female') %>% filter(Fatal == "Yes")) + a_female
+b_star_female <- nrow(sharks %>% filter(Sex == 'Female') %>% filter(Fatal == "No")) + b_female
+
+theta <- seq(0,.5,by = .0001)
+plot(theta, dbeta(theta, a_star_female, b_star_female), type='l', col="red",
+     xlab=expression(theta), ylab="Density", 
+     main="Fatality of Shark Attacks Among Females")
+lines(theta, dbeta(theta, a_female, b_female), col="blue")
+legend("topright", legend = c("Prior", "Posterior"),
+       col = c("blue", "red"), lty = 1)
+```
+
+From each distribution we simulate 100,000 random draws and use them to generate a posterior distribution
+
+```{r, echo=FALSE}
+diff_prior <- rbeta(100000, a_female, b_female) - rbeta(100000, a_male, b_male)
+diff_post <- rbeta(100000, a_star_female, b_star_female) - rbeta(100000, a_star_male, b_star_male)
+
+plot(density(diff_post), xlab=expression(theta[Female]-theta[Male]),
+     main="Difference in Fatality of Shark Attacks by Sex",
+     col="red", xlim=c(-.25, .25))
+lines(density(diff_prior), col="blue")
+legend("topright", legend = c("Prior", "Posterior"),
+       col = c("blue", "red"), lty = 1)
+```
+
+### Discussion
+
+### Appendix
+
+```{r, message=FALSE, warning=FALSE}
+#set seed for reproducability
+set.seed(2024)
+
+#Read in data and clean Sex and Fatal Variables
+#filter out data before 1900 as it is unreliable
+sharks <- read_excel("sharks.xlsx") %>% 
+  select(1:14) %>%
+  rename(Fatal = 'Fatal Y/N') %>% 
+  mutate(Year = as.numeric(Year),
+         Sex = case_when(
+           str_detect(tolower(Sex), "m") ~ "Male",
+           str_detect(tolower(Sex), "f") ~ "Female",
+           TRUE ~ NA_character_),
+         Fatal = case_when(
+           str_detect(tolower(Fatal), "n") ~ "No",
+           str_detect(tolower(Fatal), "y") ~ "Yes",
+           TRUE ~ NA_character_)) %>% 
+  filter(Year > 1900) %>% 
+  select(Year, Sex, Fatal)
+
+#generate posterior distribution of data for males
+a_male <- 2
+b_male <- 8
+a_star_male <- nrow(sharks %>% filter(Sex == 'Male') %>% filter(Fatal == "Yes")) + a_male
+b_star_male <- nrow(sharks %>% filter(Sex == 'Male') %>% filter(Fatal == "No")) + b_male
+
+#graph the prior and posterior distribution for males
+theta <- seq(0,.5,by = .0001)
+plot(theta, dbeta(theta, a_star_male, b_star_male), type='l', col="red",
+     xlab=expression(theta), ylab="Density", 
+     main="Fatality of Shark Attacks Among Males")
+lines(theta, dbeta(theta, a_male, b_male), col="blue")
+legend("topright", legend = c("Prior", "Posterior"),
+       col = c("blue", "red"), lty = 1)
+
+#generate posterior distribution for females
+a_female <- 1
+b_female <- 9
+a_star_female <- nrow(sharks %>% filter(Sex == 'Female') %>% filter(Fatal == "Yes")) + a_female
+b_star_female <- nrow(sharks %>% filter(Sex == 'Female') %>% filter(Fatal == "No")) + b_female
+
+#graph prior and posterior distributions for females
+theta <- seq(0,.5,by = .0001)
+plot(theta, dbeta(theta, a_star_female, b_star_female), type='l', col="red",
+     xlab=expression(theta), ylab="Density", 
+     main="Fatality of Shark Attacks Among Females")
+lines(theta, dbeta(theta, a_female, b_female), col="blue")
+legend("topright", legend = c("Prior", "Posterior"),
+       col = c("blue", "red"), lty = 1)
+
+#use Monte Carlo simulation to generate prior and posterior distribution for females minus males
+diff_prior <- rbeta(100000, a_female, b_female) - rbeta(100000, a_male, b_male)
+diff_post <- rbeta(100000, a_star_female, b_star_female) - rbeta(100000, a_star_male, b_star_male)
+
+#graph prior and posterior distribution for females minus males
+plot(density(diff_post), xlab=expression(theta[Female]-theta[Male]),
+     main="Difference in Fatality of Shark Attacks by Sex",
+     col="red", xlim=c(-.25, .25))
+lines(density(diff_prior), col="blue")
+legend("topright", legend = c("Prior", "Posterior"),
+       col = c("blue", "red"), lty = 1)
+
+#95% credible interval for difference in fatalities between females and males
+quantile(diff_post, c(.025, .975))
+```
