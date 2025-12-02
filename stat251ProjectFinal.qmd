@@ -34,19 +34,18 @@ sharks <- read_excel("sharks.xlsx") %>%
 
 ### Introduction
 
-Is there a difference between the fatality rate from shark attacks for men and women?
-
-We chose this research question because we are curious about the difference in proportions of fatal shark attacks among men and among women.
-
-Sharks have long been feared — especially since the movie *Jaws* came out in 1975. Are sharks really as dangerous as people think? After all, cows cause more annual deaths than sharks on average, and more commonplace things like cars are far more likely to kill you than a shark. We hope in this analysis to assuage fears (at least somewhat) concerning sharks.
+Is there a difference between the fatality rate from shark attacks for men and women? We chose this research question because we are curious about the difference in proportions of fatal shark attacks among men and among women. Sharks have long been feared — especially since the movie *Jaws* came out in 1975. Are sharks really as dangerous as people think? After all, cows cause more annual deaths than sharks on average, and more commonplace things like cars are far more likely to kill you than a shark. We hope in this analysis to assuage fears (at least somewhat) concerning sharks.
 
 ### Methods
 
-Our data comes from Global Shark Attack File ("https://www.sharkattackfile.net/"). It is a compilation of shark attack information coming from many different sources. Each of our observations represent one occurrence of a shark attack. For each observation we have information about the sex of the victim and the fatality of the attack -- whether the victim survived or was killed. Below is a graph that displays the differences in mortality rates for male and female victims.
+Our data comes from Global Shark Attack File ("https://www.sharkattackfile.net/"). It is a compilation of shark attack information coming from many different sources. Each of our observations represent one occurrence of a shark attack. For each observation we have information about the sex of the victim and the fatality of the attack -- whether the victim survived or was killed. Below is a graph that displays the differences in mortality rates for male and female victims and a table that displays the proportions of each category.
+
+|              | Male | Female |
+|--------------|:----:|:------:|
+| **Fatal**    | 918  |  108   |
+| **Nonfatal** | 3718 |  601   |
 
 ```{r, echo=FALSE, fig.width=5, fig.height=3}
-table(sharks)
-
 sharks %>% 
   filter(!is.na(Fatal)) %>% 
   filter(!is.na(Sex)) %>% 
@@ -73,7 +72,7 @@ Our parameters of interest are $\theta_{female}$ and $\theta_{male}$. These para
 
 ### Results
 
-First of all, in order to preform our analysis we obtain the posterior distributions for $\theta_{male}$. The graph below displays the prior and posterior distribution for males.
+First of all, in order to preform our analysis we obtain the posterior distributions for $\theta_{male}$. The graph below displays the prior and posterior distribution for males. We also obtain the posterior distribution for females and graph the prior and posterior for it.
 
 ```{r, echo=FALSE, fig.width=5, fig.height=4}
 a_male <- 2
@@ -90,8 +89,6 @@ legend("topright", legend = c("Prior", "Posterior"),
        col = c("blue", "red"), lty = 1)
 ```
 
-We also obtain the posterior distribution for females and graph the prior and posterior for it.
-
 ```{r, echo=FALSE, fig.width=5, fig.height=4}
 a_female <- 1
 b_female <- 9
@@ -107,8 +104,6 @@ legend("topright", legend = c("Prior", "Posterior"),
        col = c("blue", "red"), lty = 1)
 ```
 
-From each distribution we simulate 100,000 random draws and use them to generate a posterior distribution. We also plot the prior distribution using the same methods. From the 95% credible interval of the posterior, there is a 95% probability that the difference in proportions of fatal shark attacks for males and females is between -0.074 and -0.017. Therefore, using an alpha level of 0.05, we conclude that there is a statistically significant difference in the fatality rate from shark attacks for men and women, with women being less likely to die in an attack than men.
-
 ```{r, echo=FALSE}
 diff_prior <- rbeta(100000, a_female, b_female) - rbeta(100000, a_male, b_male)
 diff_post <- rbeta(100000, a_star_female, b_star_female) - rbeta(100000, a_star_male, b_star_male)
@@ -120,6 +115,8 @@ lines(density(diff_prior), col="blue")
 legend("topright", legend = c("Prior", "Posterior"),
        col = c("blue", "red"), lty = 1)
 ```
+
+We obtained a 95% credible interval of the posterior of (-0.074 and -0.017). There is a 95% probability that the difference in proportions of fatal shark attacks for males and females is between -0.074 and -0.017.
 
 ### Discussion
 
