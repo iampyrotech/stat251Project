@@ -27,7 +27,7 @@ sharks <- read_excel("sharks.xlsx") %>%
            str_detect(tolower(Fatal), "y") ~ "Yes",
            TRUE ~ NA_character_)) %>% 
   filter(Year > 1900) %>% 
-  select(Year, Sex, Fatal)
+  select(Sex, Fatal)
 ```
 
 ## Shark Analysis
@@ -36,15 +36,17 @@ sharks <- read_excel("sharks.xlsx") %>%
 
 Is there a difference between the fatality rate from shark attacks for men and women?
 
-Sharks are the best! We chose our research question because we are curious about how the fatalities between men and women compare. We're interested in seeing if there are certain factors (i.e., gender, location, activity, etc.) that impact fatality more than others.
+We chose this research question because we are curious about the difference in proportions of fatal shark attacks among men and among women.
 
-The data will help us answer our research question because we can compare the fatality rate among genders as well as the fatality rate for activity or location or whether it was a provoked or unprovoked attack.
+Sharks have long been feared — especially since the movie *Jaws* came out in 1975. Are sharks really as dangerous as people think? After all, cows cause more annual deaths than sharks on average, and more commonplace things like cars are far more likely to kill you than a shark. We hope in this analysis to assuage fears (at least somewhat) concerning sharks.
 
 ### Methods
 
 Our data comes from Global Shark Attack File ("https://www.sharkattackfile.net/"). It is a compilation of shark attack information coming from many different sources. Each of our observations represent one occurrence of a shark attack. For each observation we have information about the sex of the victim and the fatality of the attack -- whether the victim survived or was killed. Below is a graph that displays the differences in mortality rates for male and female victims.
 
 ```{r, echo=FALSE, fig.width=5, fig.height=3}
+table(sharks)
+
 sharks %>% 
   filter(!is.na(Fatal)) %>% 
   filter(!is.na(Sex)) %>% 
