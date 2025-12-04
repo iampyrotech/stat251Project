@@ -40,12 +40,24 @@ Is there a difference between the fatality rate from shark attacks for men and w
 
 Our data comes from Global Shark Attack File ("https://www.sharkattackfile.net/"). It is a compilation of shark attack information coming from many different sources. Each of our observations represent one occurrence of a shark attack. For each observation we have information about the sex of the victim and the fatality of the attack -- whether the victim survived or was killed. Below is a graph that displays the differences in mortality rates for male and female victims and a table that displays the proportions of each category.
 
-|              | Male | Female |
-|--------------|:----:|:------:|
-| **Fatal**    | 918  |  108   |
-| **Nonfatal** | 3718 |  601   |
+\vspace{2.6em}
+::: {.tbl tbl-cap="Counts and Fatality Rates" tbl-align="center" tbl-width="80%"}
+| Sex    | Fatal | Nonfatal | Fatality Rate (%) |
+|--------|-------|----------|--------------------|
+| Male   | 918   | 3718     | 19.8              |
+| Female | 108   | 601      | 15.2              |
+:::
 
-```{r, echo=FALSE, fig.width=5, fig.height=3}
+
+```{r, echo=FALSE}
+#| fig-align: "center"
+#| out-width: "80%"
+#| fig-asp: 0.7
+#| dpi: 300
+#| warning: false
+#| message: false
+
+
 sharks %>% 
   filter(!is.na(Fatal)) %>% 
   filter(!is.na(Sex)) %>% 
@@ -68,13 +80,21 @@ sharks %>%
 
 Our data lends itself to the binomial setting. We have a fixed number of events where each has a binary outcome, fatal or nonfatal. It is fairly reasonable to assume that our events are independent. It is unlikely that one shark attack has any sort of significant impact on another. The assumption of greatest concern in using a binomial likelihood is the constant fatality probability of each event. It is unlikely that the fatality of each shark attack is exactly the same. Ignoring this violation would normally result in underestimating the variability of our prediction for the probability of a shark attack being fatal. However, using beta-binomial Bayesian inference allows us to accurately convey our levels of uncertainty.
 
-Our parameters of interest are $\theta_{female}$ and $\theta_{male}$. These parameters represent the probability that a shark attack is fatal for each respective sex. With these parameters, we can use Monte Carlo simulation to generate a posterior distribution for $\theta_{female-male}$. With this distribution we can answer our question of whether one sex is more likely to survive a shark attack than another is. Based on the likelihood chosen and our prior beliefs about our shark attacks, we have chosen $\pi_{female} \sim beta(1,9)$ for our prior for females. We chose a similar $\pi_{male} \sim beta(2,8)$ prior for male fatality rates. We chose beta priors because they are conjugate with the binomial setting, and because they make it easy for us to encode our prior beliefs. In our priors we assume that about 1/10 shark attacks will be fatal to women and about 2/10 shark attacks will be fatal for men. Our priors encode a slight survival favoritism towards women because that is what we expect to occur in our data. This favoritism is very weak overall, allowing room for our data to inform our posterior distribution.
+Our parameters of interest are $\theta_{female}$ and $\theta_{male}$. These parameters represent the probability that a shark attack is fatal for each respective sex. With these parameters, we can use Monte Carlo simulation to generate a posterior distribution for $\theta_{female-male}$. This distribution allows us to answer our question of whether one sex is more likely to survive a shark attack than the other. Based on the likelihood of the data and our prior beliefs about shark attacks, we chose $\pi_{female} \sim beta(1,9)$ for our prior for females. We chose a similar $\pi_{male} \sim beta(2,8)$ prior for male fatality rates. Beta priors are conjugate with the binomial setting and they will make it easy for us to encode our prior beliefs. In our priors we assume that about 1/10 shark attacks will be fatal to women and about 2/10 shark attacks will be fatal for men, encoding a slight survival favoritism towards women. This favoritism is very weak overall, allowing room for our data to inform our posterior distribution.
 
 ### Results
 
-First of all, in order to preform our analysis we obtain the posterior distributions for $\theta_{male}$. The graph below displays the prior and posterior distribution for males. We also obtain the posterior distribution for females and graph the prior and posterior for it.
+First of all, in order to preform our analysis we obtain the posterior distributions for $\theta_{male}$ and $\theta_{female}$. Because we chose conjugate priors, we can obtain these through a simple process of adding the results of our data onto our priors. The graphs below display the prior and posterior distributions for $\theta_{male}$ and $\theta_{female}$.
 
-```{r, echo=FALSE, fig.width=5, fig.height=4}
+```{r, echo=FALSE}
+#| fig-align: "center"
+#| out-width: "80%"
+#| fig-asp: 0.6
+#| dpi: 300
+#| warning: false
+#| message: false
+
+
 a_male <- 2
 b_male <- 8
 a_star_male <- nrow(sharks %>% filter(Sex == 'Male') %>% filter(Fatal == "Yes")) + a_male
@@ -89,7 +109,15 @@ legend("topright", legend = c("Prior", "Posterior"),
        col = c("blue", "red"), lty = 1)
 ```
 
-```{r, echo=FALSE, fig.width=5, fig.height=4}
+```{r, echo=FALSE}
+#| fig-align: "center"
+#| out-width: "80%"
+#| fig-asp: 0.6
+#| dpi: 300
+#| warning: false
+#| message: false
+
+
 a_female <- 1
 b_female <- 9
 a_star_female <- nrow(sharks %>% filter(Sex == 'Female') %>% filter(Fatal == "Yes")) + a_female
@@ -103,8 +131,17 @@ lines(theta, dbeta(theta, a_female, b_female), col="blue")
 legend("topright", legend = c("Prior", "Posterior"),
        col = c("blue", "red"), lty = 1)
 ```
+Through Monte Carlo simulation we obtain the posterior distribution for the difference of fatality rates between males and females from shark attacks. We plot this posterior distribution below with its associated prior. We also obtained a 95% credible interval of between -0.074 and -0.017. This means that there is a 95% probability that the difference in proportions of fatal shark attacks for males and females is between -0.074 and -0.017.
 
 ```{r, echo=FALSE}
+#| fig-align: "center"
+#| out-width: "75%"
+#| fig-asp: 0.58
+#| dpi: 300
+#| warning: false
+#| message: false
+
+
 diff_prior <- rbeta(100000, a_female, b_female) - rbeta(100000, a_male, b_male)
 diff_post <- rbeta(100000, a_star_female, b_star_female) - rbeta(100000, a_star_male, b_star_male)
 
@@ -115,8 +152,6 @@ lines(density(diff_prior), col="blue")
 legend("topright", legend = c("Prior", "Posterior"),
        col = c("blue", "red"), lty = 1)
 ```
-
-We obtained a 95% credible interval of the posterior of (-0.074 and -0.017). There is a 95% probability that the difference in proportions of fatal shark attacks for males and females is between -0.074 and -0.017.
 
 ### Discussion
 
